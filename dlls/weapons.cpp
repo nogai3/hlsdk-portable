@@ -226,7 +226,7 @@ void ExplodeModel( const Vector &vecOrigin, float speed, int model, int count )
 int giAmmoIndex = 0;
 
 // Precaches the ammo and queues the ammo info for sending to clients
-void AddAmmoNameToAmmoRegistry( const char *szAmmoname )
+/*void AddAmmoNameToAmmoRegistry( const char *szAmmoname )
 {
 	// make sure it's not already in the registry
 	for( int i = 0; i < MAX_AMMO_SLOTS; i++ )
@@ -245,10 +245,32 @@ void AddAmmoNameToAmmoRegistry( const char *szAmmoname )
 
 	CBasePlayerItem::AmmoInfoArray[giAmmoIndex].pszName = szAmmoname;
 	CBasePlayerItem::AmmoInfoArray[giAmmoIndex].iId = giAmmoIndex;   // yes, this info is redundant
+}*/
+void AddAmmoNameToAmmoRegistry( const char *szAmmoname )
+{
+	if (!szAmmoname || (uintptr_t)szAmmoname < 0x10000 || (uintptr_t)szAmmoname >= 0x7FFF0000 || !*szAmmoname)
+		return;
+
+	for( int i = 0; i < MAX_AMMO_SLOTS; i++ )
+	{
+		const char *pszCurrent = CBasePlayerItem::AmmoInfoArray[i].pszName;
+		if( !pszCurrent || (uintptr_t)pszCurrent < 0x10000 || (uintptr_t)pszCurrent >= 0x7FFF0000 )
+			continue;
+
+		if( stricmp( pszCurrent, szAmmoname ) == 0 )
+			return;
+	}
+
+	giAmmoIndex++;
+	if( giAmmoIndex >= MAX_AMMO_SLOTS )
+		giAmmoIndex = 1;
+
+	CBasePlayerItem::AmmoInfoArray[giAmmoIndex].pszName = szAmmoname;
+	CBasePlayerItem::AmmoInfoArray[giAmmoIndex].iId = giAmmoIndex;
 }
 
 // Precaches the weapon and queues the weapon info for sending to clients
-void UTIL_PrecacheOtherWeapon( const char *szClassname )
+/*void UTIL_PrecacheOtherWeapon( const char *szClassname )
 {
 	edict_t	*pent;
 
@@ -282,111 +304,128 @@ void UTIL_PrecacheOtherWeapon( const char *szClassname )
 	}
 
 	REMOVE_ENTITY( pent );
+}*/
+void UTIL_PrecacheOtherWeapon( const char *szClassname )
+{
+	edict_t *pent = CREATE_NAMED_ENTITY( MAKE_STRING( szClassname ) );
+	if( FNullEnt( pent ) )
+	{
+		ALERT( at_console, "NULL Ent in UTIL_PrecacheOtherWeapon: %s\n", szClassname );
+		return;
+	}
+
+	CBaseEntity *pEntity = CBaseEntity::Instance( VARS( pent ) );
+
+	if( pEntity )
+	{
+		ItemInfo II;
+		memset(&II, 0, sizeof(II));
+
+		pEntity->Precache();
+		if( ( (CBasePlayerItem*)pEntity )->GetItemInfo( &II ) )
+		{
+			if (II.iId >= 0 && II.iId < MAX_WEAPONS)
+			{
+				CBasePlayerItem::ItemInfoArray[II.iId] = II;
+			}
+
+			if( II.pszAmmo1 && (uintptr_t)II.pszAmmo1 >= 0x10000 && (uintptr_t)II.pszAmmo1 < 0x7FFF0000 && *II.pszAmmo1 )
+			{
+				AddAmmoNameToAmmoRegistry( II.pszAmmo1 );
+			}
+
+			if( II.pszAmmo2 && (uintptr_t)II.pszAmmo2 >= 0x10000 && (uintptr_t)II.pszAmmo2 < 0x7FFF0000 && *II.pszAmmo2 )
+			{
+				AddAmmoNameToAmmoRegistry( II.pszAmmo2 );
+			}
+		}
+	}
+
+	REMOVE_ENTITY( pent );
 }
 
-// called by worldspawn
-void W_Precache( void )
-{
-	memset( CBasePlayerItem::ItemInfoArray, 0, sizeof(CBasePlayerItem::ItemInfoArray) );
-	memset( CBasePlayerItem::AmmoInfoArray, 0, sizeof(CBasePlayerItem::AmmoInfoArray) );
+// extern void RegisterModularCvars();
+void W_Precache(void) {
+	// RegisterModularCvars();
+
+	memset(CBasePlayerItem::ItemInfoArray, 0, sizeof(CBasePlayerItem::ItemInfoArray));
+	memset(CBasePlayerItem::AmmoInfoArray, 0, sizeof(CBasePlayerItem::AmmoInfoArray));
 	giAmmoIndex = 0;
 
-	// custom items...
+	// ITEMS
+	UTIL_PrecacheOther("item_762");
+	UTIL_PrecacheOther("item_556");
+	UTIL_PrecacheOther("item_918");
+	UTIL_PrecacheOther("item_1276");
+	UTIL_PrecacheOther("item_50ae");
+	UTIL_PrecacheOther("item_357sig");
+	// WEAPONS
+	UTIL_PrecacheOtherWeapon("weapon_ak47");
+	UTIL_PrecacheOtherWeapon("weapon_m4a1");
+	UTIL_PrecacheOtherWeapon("weapon_m3");
+	UTIL_PrecacheOtherWeapon("weapon_glock18");
+	UTIL_PrecacheOtherWeapon("weapon_deagle");
+	UTIL_PrecacheOtherWeapon("weapon_p228");
 
-	// common world objects
-	UTIL_PrecacheOther( "item_suit" );
-	UTIL_PrecacheOther( "item_healthkit" );
-	UTIL_PrecacheOther( "item_battery" );
-	UTIL_PrecacheOther( "item_antidote" );
-	UTIL_PrecacheOther( "item_security" );
-	UTIL_PrecacheOther( "item_longjump" );
+	// GRENADES
+	UTIL_PrecacheOther("wgrenade_proj");
+	UTIL_PrecacheOtherWeapon("weapon_hegrenade");
+	UTIL_PrecacheOtherWeapon("weapon_flashbang");
+	UTIL_PrecacheOtherWeapon("weapon_smokegrenade");
 
-	// shotgun
-	UTIL_PrecacheOtherWeapon( "weapon_shotgun" );
-	UTIL_PrecacheOther( "ammo_buckshot" );
-
-	// crowbar
-	UTIL_PrecacheOtherWeapon( "weapon_crowbar" );
-
-	// glock
-	UTIL_PrecacheOtherWeapon( "weapon_9mmhandgun" );
-	UTIL_PrecacheOther( "ammo_9mmclip" );
-
-	// mp5
-	UTIL_PrecacheOtherWeapon( "weapon_9mmAR" );
-	UTIL_PrecacheOther( "ammo_9mmAR" );
-	UTIL_PrecacheOther( "ammo_ARgrenades" );
-
-	// 9mm ammo box
-	UTIL_PrecacheOther( "ammo_9mmbox" );
-
-#if !OEM_BUILD && !HLDEMO_BUILD
-	// python
-	UTIL_PrecacheOtherWeapon( "weapon_357" );
-	UTIL_PrecacheOther( "ammo_357" );
-
-	// gauss
-	UTIL_PrecacheOtherWeapon( "weapon_gauss" );
-	UTIL_PrecacheOther( "ammo_gaussclip" );
-
-	// rpg
-	UTIL_PrecacheOtherWeapon( "weapon_rpg" );
-	UTIL_PrecacheOther( "ammo_rpgclip" );
-
-	// crossbow
-	UTIL_PrecacheOtherWeapon( "weapon_crossbow" );
-	UTIL_PrecacheOther( "ammo_crossbow" );
-
-	// egon
-	UTIL_PrecacheOtherWeapon( "weapon_egon" );
-#endif
-	// tripmine
-	UTIL_PrecacheOtherWeapon( "weapon_tripmine" );
-#if !OEM_BUILD && !HLDEMO_BUILD
-	// satchel charge
-	UTIL_PrecacheOtherWeapon( "weapon_satchel" );
-#endif
-	// hand grenade
-	UTIL_PrecacheOtherWeapon("weapon_handgrenade");
-#if !OEM_BUILD && !HLDEMO_BUILD
-	// squeak grenade
-	UTIL_PrecacheOtherWeapon( "weapon_snark" );
-
-	// hornetgun
-	UTIL_PrecacheOtherWeapon( "weapon_hornetgun" );
-
-	if( g_pGameRules->IsDeathmatch() )
-	{
-		UTIL_PrecacheOther( "weaponbox" );// container for dropped deathmatch weapons
+	if (g_pGameRules->IsDeathmatch()) {
+		UTIL_PrecacheOther("weaponbox");
 	}
-#endif
-	g_sModelIndexFireball = PRECACHE_MODEL( "sprites/zerogxplode.spr" );// fireball
-	g_sModelIndexWExplosion = PRECACHE_MODEL( "sprites/WXplo1.spr" );// underwater fireball
-	g_sModelIndexSmoke = PRECACHE_MODEL( "sprites/steam1.spr" );// smoke
-	g_sModelIndexBubbles = PRECACHE_MODEL( "sprites/bubble.spr" );//bubbles
-	g_sModelIndexBloodSpray = PRECACHE_MODEL( "sprites/bloodspray.spr" ); // initial blood
-	g_sModelIndexBloodDrop = PRECACHE_MODEL( "sprites/blood.spr" ); // splattered blood 
 
-	g_sModelIndexLaser = PRECACHE_MODEL( g_pModelNameLaser );
-	g_sModelIndexLaserDot = PRECACHE_MODEL( "sprites/laserdot.spr" );
+	g_sModelIndexBloodSpray = PRECACHE_MODEL("sprites/bloodspray.spr");
+	g_sModelIndexBloodDrop = PRECACHE_MODEL("sprites/blood.spr");
 
-	// used by explosions
-	PRECACHE_MODEL( "models/grenade.mdl" );
-	PRECACHE_MODEL( "sprites/explode1.spr" );
-
-	PRECACHE_SOUND( "weapons/debris1.wav" );// explosion aftermaths
-	PRECACHE_SOUND( "weapons/debris2.wav" );// explosion aftermaths
-	PRECACHE_SOUND( "weapons/debris3.wav" );// explosion aftermaths
-
-	PRECACHE_SOUND( "weapons/grenade_hit1.wav" );//grenade
-	PRECACHE_SOUND( "weapons/grenade_hit2.wav" );//grenade
-	PRECACHE_SOUND( "weapons/grenade_hit3.wav" );//grenade
-
-	PRECACHE_SOUND( "weapons/bullet_hit1.wav" );	// hit by bullet
-	PRECACHE_SOUND( "weapons/bullet_hit2.wav" );	// hit by bullet
-
-	PRECACHE_SOUND( "items/weapondrop1.wav" );// weapon falls to the ground
+	PRECACHE_SOUND("weapons/bullet_hit1.wav");
+	PRECACHE_SOUND("weapons/bullet_hit2.wav");
+	PRECACHE_SOUND("items/weapondrop1.wav");
+	PRECACHE_MODEL("models/w_weaponbox.mdl");
+	PRECACHE_MODEL("models/rshell.mdl");
+	PRECACHE_SOUND("items/9mmclip1.wav");
+	PRECACHE_MODEL("sprites/zerogxplode.spr");
+	PRECACHE_MODEL("sprites/steam1.spr");
 }
+/*void W_Precache(void) {
+	RegisterModularCvars();
+
+	memset(CBasePlayerItem::ItemInfoArray, 0, sizeof(CBasePlayerItem::ItemInfoArray));
+	memset(CBasePlayerItem::AmmoInfoArray, 0, sizeof(CBasePlayerItem::AmmoInfoArray));
+	giAmmoIndex = 0;
+
+	// ITEMS
+	UTIL_PrecacheOther("item_762");
+	UTIL_PrecacheOther("item_556");
+	UTIL_PrecacheOther("item_918");
+	UTIL_PrecacheOther("item_1276");
+	// WEAPONS
+	UTIL_PrecacheOtherWeapon("weapon_ak47");
+	UTIL_PrecacheOtherWeapon("weapon_m4a1");
+	UTIL_PrecacheOtherWeapon("weapon_m3");
+	UTIL_PrecacheOtherWeapon("weapon_glock18");
+	// GRENADES
+	UTIL_PrecacheOtherWeapon("weapon_hegrenade");
+	UTIL_PrecacheOtherWeapon("weapon_flashbang");
+	UTIL_PrecacheOtherWeapon("weapon_smokegrenade");
+
+	if (g_pGameRules->IsDeathmatch()) {
+		UTIL_PrecacheOther("weaponbox");
+	}
+
+	g_sModelIndexBloodSpray = PRECACHE_MODEL("sprites/bloodspray.spr");
+	g_sModelIndexBloodDrop = PRECACHE_MODEL("sprites/blood.spr");
+
+	PRECACHE_SOUND("weapons/bullet_hit1.wav");
+	PRECACHE_SOUND("weapons/bullet_hit2.wav");
+	PRECACHE_SOUND("items/weapondrop1.wav");
+	PRECACHE_MODEL("models/w_weaponbox.mdl");
+	PRECACHE_MODEL("models/rshell.mdl");
+	PRECACHE_SOUND("items/9mmclip1.wav");
+}*/
+// called by worldspawn
 
 TYPEDESCRIPTION	CBasePlayerItem::m_SaveData[] =
 {

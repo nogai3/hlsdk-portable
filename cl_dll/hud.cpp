@@ -385,6 +385,7 @@ void CHud::Init( void )
 	m_AmmoSecondary.Init();
 	m_TextMessage.Init();
 	m_StatusIcons.Init();
+	m_Crosshair.Init();
 	GetClientVoiceMgr()->Init(&g_VoiceStatusHelper, (vgui::Panel**)&gViewPort);
 
 	m_MOTD.Init();
@@ -583,6 +584,7 @@ void CHud::VidInit( void )
 	GetClientVoiceMgr()->VidInit();
 	m_MOTD.VidInit();
 	m_Scoreboard.VidInit();
+	m_Crosshair.VidInit();
 }
 
 int CHud::MsgFunc_Logo( const char *pszName,  int iSize, void *pbuf )

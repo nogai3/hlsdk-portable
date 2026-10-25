@@ -1011,6 +1011,9 @@ void CStudioModelRenderer::StudioMergeBones( model_t *m_pSubModel )
 	float bonematrix[3][4];
 	static vec4_t q[MAXSTUDIOBONES];
 
+	if( !m_pStudioHeader || !m_pSubModel )
+		return;
+
 	if( m_pCurrentEntity->curstate.sequence >=  m_pStudioHeader->numseq )
 	{
 		m_pCurrentEntity->curstate.sequence = 0;
@@ -1501,22 +1504,23 @@ int CStudioModelRenderer::StudioDrawPlayer( int flags, entity_state_t *pplayer )
 
 		if( pplayer->weaponmodel )
 		{
-			cl_entity_t saveent = *m_pCurrentEntity;
-
 			model_t *pweaponmodel = IEngineStudio.GetModelByIndex( pplayer->weaponmodel );
+			studiohdr_t *pweaponhdr = pweaponmodel ? (studiohdr_t *)IEngineStudio.Mod_Extradata( pweaponmodel ) : NULL;
 
-			m_pStudioHeader = (studiohdr_t *)IEngineStudio.Mod_Extradata( pweaponmodel );
-			IEngineStudio.StudioSetHeader( m_pStudioHeader );
+			if( pweaponhdr )
+			{
+				cl_entity_t saveent = *m_pCurrentEntity;
 
-			StudioMergeBones( pweaponmodel );
+				m_pStudioHeader = pweaponhdr;
+				IEngineStudio.StudioSetHeader( m_pStudioHeader );
 
-			IEngineStudio.StudioSetupLighting( &lighting );
+				StudioMergeBones( pweaponmodel );
+				IEngineStudio.StudioSetupLighting( &lighting );
+				StudioRenderModel();
+				StudioCalcAttachments();
 
-			StudioRenderModel();
-
-			StudioCalcAttachments();
-
-			*m_pCurrentEntity = saveent;
+				*m_pCurrentEntity = saveent;
+			}
 		}
 	}
 

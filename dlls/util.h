@@ -334,7 +334,7 @@ extern void			UTIL_PrecacheOther( const char *szClassname );
 // prints a message to each client
 extern void			UTIL_ClientPrintAll( int msg_dest, const char *msg_name, const char *param1 = NULL, const char *param2 = NULL, const char *param3 = NULL, const char *param4 = NULL );
 
-inline void			UTIL_CenterPrintAll( const char *msg_name, const char *param1 = NULL, const char *param2 = NULL, const char *param3 = NULL, const char *param4 = NULL ) 
+inline void			UTIL_CenterPrintAll( const char *msg_name, const char *param1 = NULL, const char *param2 = NULL, const char *param3 = NULL, const char *param4 = NULL )
 {
 	UTIL_ClientPrintAll( HUD_PRINTCENTER, msg_name, param1, param2, param3, param4 );
 }
@@ -377,7 +377,7 @@ extern char *UTIL_dtos4( int d );
 // Writes message to console with timestamp and FragLog header.
 extern void			UTIL_LogPrintf( const char *fmt, ... );
 
-// Sorta like FInViewCone, but for nonmonsters. 
+// Sorta like FInViewCone, but for nonmonsters.
 extern float UTIL_DotPoints ( const Vector &vecSrc, const Vector &vecCheck, const Vector &vecDir );
 
 extern void UTIL_StripToken( const char *pKey, char *pDest, int nLen );// for redundant keynames
@@ -411,7 +411,7 @@ extern DLL_GLOBAL const Vector g_vecZero;
 
 #define SPEAKER_START_SILENT			1	// wait for trigger 'on' to start announcements
 
-#define SND_SPAWNING		(1<<8)		// duplicated in protocol.h we're spawing, used in some cases for ambients 
+#define SND_SPAWNING		(1<<8)		// duplicated in protocol.h we're spawing, used in some cases for ambients
 #define SND_STOP			(1<<5)		// duplicated in protocol.h stop sound
 #define SND_CHANGE_VOL		(1<<6)		// duplicated in protocol.h change sound vol
 #define SND_CHANGE_PITCH	(1<<7)		// duplicated in protocol.h change sound pitch
@@ -540,7 +540,7 @@ void EMIT_GROUPNAME_SUIT(edict_t *entity, const char *groupname);
 	{ for (int i = 0; i < (int)ARRAYSIZE( a ); i++ ) PRECACHE_SOUND( a[i] ); }
 
 #define EMIT_SOUND_ARRAY_DYN( chan, array ) \
-	EMIT_SOUND_DYN ( ENT(pev), chan , array [ RANDOM_LONG(0,ARRAYSIZE( array )-1) ], 1.0, ATTN_NORM, 0, RANDOM_LONG(95,105) ); 
+	EMIT_SOUND_DYN ( ENT(pev), chan , array [ RANDOM_LONG(0,ARRAYSIZE( array )-1) ], 1.0, ATTN_NORM, 0, RANDOM_LONG(95,105) );
 
 #define RANDOM_SOUND_ARRAY( array ) (array) [ RANDOM_LONG(0,ARRAYSIZE( (array) )-1) ]
 

@@ -528,6 +528,7 @@ private:
 //
 //-----------------------------------------------------
 //
+#include "hud_crosshair.h"
 class CHud
 {
 private:
@@ -560,6 +561,7 @@ public:
 
 	cvar_t  *m_pCvarMOTDVGUI;
 	cvar_t  *m_pCvarScoreboardVGUI;
+	CHudCrosshair m_Crosshair;
 
 	int m_iFontHeight;
 	int DrawHudNumber( int x, int y, int iFlags, int iNumber, int r, int g, int b );

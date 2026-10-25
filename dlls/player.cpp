@@ -2999,6 +2999,8 @@ void CBasePlayer::Spawn( void )
 	SET_VIEW(edict(), edict());
 
 	g_pGameRules->PlayerSpawn( this );
+	m_iHideHUD = 0;
+	pev->weapons |= (1 << WEAPON_SUIT);
 }
 
 void CBasePlayer::Precache( void )

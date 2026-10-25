@@ -954,7 +954,7 @@ void UTIL_SetSize( entvars_t *pev, const Vector &vecMin, const Vector &vecMax )
 {
 	SET_SIZE( ENT( pev ), vecMin, vecMax );
 }
-	
+
 float UTIL_VecToYaw( const Vector &vec )
 {
 	return VEC_TO_YAW( vec );
@@ -980,7 +980,7 @@ float UTIL_Approach( float target, float value, float speed )
 		value += speed;
 	else if( delta < -speed )
 		value -= speed;
-	else 
+	else
 		value = target;
 
 	return value;
@@ -1006,7 +1006,7 @@ float UTIL_ApproachAngle( float target, float value, float speed )
 		value += speed;
 	else if( delta < -speed )
 		value -= speed;
-	else 
+	else
 		value = target;
 
 	return value;
@@ -1111,7 +1111,7 @@ void UTIL_BloodStream( const Vector &origin, const Vector &direction, int color,
 		WRITE_BYTE( color );
 		WRITE_BYTE( Q_min( amount, 255 ) );
 	MESSAGE_END();
-}				
+}
 
 void UTIL_BloodDrips( const Vector &origin, const Vector &direction, int color, int amount )
 {
@@ -1140,7 +1140,7 @@ void UTIL_BloodDrips( const Vector &origin, const Vector &direction, int color, 
 		WRITE_BYTE( color );								// color index into host_basepal
 		WRITE_BYTE( Q_min( Q_max( 3, amount / 10 ), 16 ) );		// size
 	MESSAGE_END();
-}				
+}
 
 Vector UTIL_RandomBloodVector( void )
 {
@@ -1519,7 +1519,7 @@ void UTIL_PrecacheOther( const char *szClassname )
 		ALERT( at_console, "NULL Ent in UTIL_PrecacheOther\n" );
 		return;
 	}
-	
+
 	CBaseEntity *pEntity = CBaseEntity::Instance( VARS( pent ) );
 	if( pEntity )
 		pEntity->Precache();
@@ -1534,7 +1534,7 @@ void UTIL_LogPrintf( const char *fmt, ... )
 {
 	va_list		argptr;
 	static char	string[1024];
-	
+
 	va_start( argptr, fmt );
 	vsprintf( string, fmt, argptr );
 	va_end( argptr );
@@ -1593,7 +1593,7 @@ static int gSizes[FIELD_TYPECOUNT] =
 #if GNUC
 	sizeof(void *) * 2,	// FIELD_FUNCTION
 #else
-	sizeof(void *),		// FIELD_FUNCTION	
+	sizeof(void *),		// FIELD_FUNCTION
 #endif
 	sizeof(int),		// FIELD_BOOLEAN
 	sizeof(short),		// FIELD_SHORT
@@ -1771,7 +1771,7 @@ unsigned short CSaveRestoreBuffer::TokenHash( const char *pszToken )
 		}
 	}
 
-	// Token hash table full!!! 
+	// Token hash table full!!!
 	// [Consider doing overflow table(s) after the main table & limiting linear hash table search]
 	ALERT( at_error, "CSaveRestoreBuffer :: TokenHash() is COMPLETELY FULL!\n" );
 	return 0;
@@ -2363,7 +2363,7 @@ int CRestore::ReadFields( const char *pname, void *pBaseData, TYPEDESCRIPTION *p
 		lastField = ReadField( pBaseData, pFields, fieldCount, lastField, header.size, m_pdata->pTokens[header.token], header.pData );
 		lastField++;
 	}
-	
+
 	return 1;
 }
 

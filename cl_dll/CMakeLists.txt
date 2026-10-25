@@ -121,6 +121,8 @@ set (CLDLL_SOURCES
 	util.cpp
 	view.cpp
 	../public/safe_snprintf.c
+		hud_crosshair.cpp
+		hud_crosshair.h
 )
 
 list(APPEND CLDLL_SOURCES

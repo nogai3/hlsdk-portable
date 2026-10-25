@@ -171,7 +171,23 @@ include_directories (. wpn_shared ../common ../engine ../pm_shared ../game_share
 if(MSVC)
 	set(SVDLL_SOURCES
 		${SVDLL_SOURCES}
-		hl.def)
+		hl.def
+            weapon_modular.h
+			weapon_ak47.cpp
+			weapon_m4a1.cpp
+			weapon_m3.cpp
+			weapon_glock18.cpp
+			grenade_shared.h
+			grenade_projectile.cpp
+			grenade_modular.h
+			grenade_he.cpp
+			grenade_smoke.cpp
+			grenade_flash.cpp
+            weapon_definitions.h
+			weapon_deagle.cpp
+			weapon_p228.cpp
+			weapon_dualelites.cpp
+	)
 endif()
 
 add_library (${SVDLL_LIBRARY} SHARED ${SVDLL_SOURCES})
