@@ -46,12 +46,10 @@ endif()
 
 set (SVDLL_SOURCES
 	agrunt.cpp
-	airtank.cpp
-	aflock.cpp
+		aflock.cpp
 	animating.cpp
 	animation.cpp
-	apache.cpp
-	barnacle.cpp
+		barnacle.cpp
 	barney.cpp
 	bigmomma.cpp
 	bloater.cpp
@@ -62,38 +60,28 @@ set (SVDLL_SOURCES
 	client.cpp
 	combat.cpp
 	controller.cpp
-	crossbow.cpp
-	crowbar.cpp
-	defaultai.cpp
+		defaultai.cpp
 	doors.cpp
 	effects.cpp
-	egon.cpp
-	explode.cpp
+		explode.cpp
 	flyingmonster.cpp
 	func_break.cpp
 	func_tank.cpp
 	game.cpp
 	gamerules.cpp
 	gargantua.cpp
-	gauss.cpp
-	genericmonster.cpp
-	ggrenade.cpp
-	globals.cpp
-	glock.cpp
-	gman.cpp
+		genericmonster.cpp
+		globals.cpp
+		gman.cpp
 	h_ai.cpp
 	h_battery.cpp
 	h_cine.cpp
 	h_cycler.cpp
 	h_export.cpp
-	handgrenade.cpp
-	hassassin.cpp
-	headcrab.cpp
+		headcrab.cpp
 	healthkit.cpp
-	hgrunt.cpp
-	hornet.cpp
-	hornetgun.cpp
-	houndeye.cpp
+		hornet.cpp
+		houndeye.cpp
 	ichthyosaur.cpp
 	islave.cpp
 	items.cpp
@@ -103,9 +91,7 @@ set (SVDLL_SOURCES
 	monstermaker.cpp
 	monsters.cpp
 	monsterstate.cpp
-	mortar.cpp
-	mp5.cpp
-	multiplay_gamerules.cpp
+		multiplay_gamerules.cpp
 	nihilanth.cpp
 	nodes.cpp
 	observer.cpp
@@ -115,30 +101,24 @@ set (SVDLL_SOURCES
 	plats.cpp
 	player.cpp
 	playermonster.cpp
-	python.cpp
-	rat.cpp
+		rat.cpp
 	roach.cpp
-	rpg.cpp
-	satchel.cpp
-	schedule.cpp
+		schedule.cpp
 	scientist.cpp
 	scripted.cpp
-	shotgun.cpp
-	singleplay_gamerules.cpp
+		singleplay_gamerules.cpp
 	skill.cpp
 	sound.cpp
 	soundent.cpp
 	spectator.cpp
 	squadmonster.cpp
-	squeakgrenade.cpp
-	subs.cpp
+		subs.cpp
 	talkmonster.cpp
 	teamplay_gamerules.cpp
 	tempmonster.cpp
 	tentacle.cpp
 	triggers.cpp
-	tripmine.cpp
-	turret.cpp
+		turret.cpp
 	util.cpp
 	vehicle.cpp
 	weapons.cpp

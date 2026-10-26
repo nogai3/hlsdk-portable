@@ -16,7 +16,7 @@ static ModularWeaponInfo kAK47Info = {
     "weapons/ak47_1.wav",         // soundFire
     "weapons/dryfirevalue.wav",   // soundEmpty
     1, 1,                         // slot, position
-    "ak47", WEAPON_AK47,                  // animExtension, weaponId
+    ANIMEXT_AK47, WEAPON_AK47,                  // animExtension, weaponId
     0, 1, 2,                      // animIdle (0), animReload (1), animDraw (2)
     3, 5,                         // animFireMin (3), animFireMax (5)
     3.08f, "models/rshell.mdl"           // shellModel

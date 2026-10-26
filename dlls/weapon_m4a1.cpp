@@ -16,7 +16,7 @@ static ModularWeaponInfo kM4A1Info = {
     "weapons/m4a1_1.wav",         // soundFire
     "weapons/dryfirevalue.wav",   // soundEmpty
     1, 3,                         // slot, position
-    "ref_aim_rifle", WEAPON_M4A1,                  // animExtension, weaponId
+    "rifle", WEAPON_M4A1,                  // animExtension, weaponId
     0, 4, 5,                      // animIdle (0), animReload (1), animDraw (2)
     1, 3,                         // animFireMin (3), animFireMax (5)
     3.08f, "models/rshell.mdl"           // shellModel
@@ -36,7 +36,7 @@ static ModularWeaponInfo kM4A1UnsilInfo = {
     "weapons/m4a1_unsil_1.wav",         // soundFire
     "weapons/dryfirevalue.wav",   // soundEmpty
     1, 3,                         // slot, position
-    "carbine", WEAPON_M4A1,                  // animExtension, weaponId
+    ANIMEXT_RIFLE, WEAPON_M4A1,                  // animExtension, weaponId
     7, 11, 12,                      // animIdle (0), animReload (1), animDraw (2)
     8, 10,                         // animFireMin (3), animFireMax (5)
     3.08f,

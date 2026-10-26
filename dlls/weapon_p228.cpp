@@ -16,7 +16,7 @@ static ModularWeaponInfo kP228Info = {
     "weapons/p228_1.wav",         // soundFire
     "weapons/dryfirevalue.wav",   // soundEmpty
     3, 1,                        // slot, position
-    "onehanded", WEAPON_P228,     // animExtension, weaponId
+    ANIMEXT_ONEHANDED, WEAPON_P228,     // animExtension, weaponId
     0, 6, 7,                      // animIdle (0), animReload (4), animDraw (5)
     1, 3,                         // animFireMin (1), animFireMax (3)
     2.7f, "models/pshell.mdl"     // reloadTime, shellModel

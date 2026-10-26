@@ -16,7 +16,7 @@ static ModularWeaponInfo kDeagleInfo = {
     "weapons/deagle_1.wav",
     "weapons/dryfirevalue.wav",
     3, 1,
-    "onehanded", WEAPON_DEAGLE,
+    ANIMEXT_ONEHANDED, WEAPON_DEAGLE,
     0, 4, 5,
     1, 2,
     2.2f, "models/rshell.mdl"

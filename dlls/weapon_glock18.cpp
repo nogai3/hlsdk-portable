@@ -37,7 +37,7 @@ static ModularWeaponInfo kGlock18BurstInfo = {
         "weapons/glock18_1.wav",
         "weapons/dryfirevalue.wav",
         2, 1,
-        "onehanded", WEAPON_GLOCK18,
+        ANIMEXT_ONEHANDED, WEAPON_GLOCK18,
         0, 7, 8,
         3, 5,
         2.17f, "models/rshell.mdl"

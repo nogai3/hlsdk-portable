@@ -1,8 +1,9 @@
-/**
+/***
  * WarLands | A LighSync Games (Half-Life) Mod
  * Created by glackus. At 22.10.2026.
- * (C) Copyright. LighSync Games, Inc. 2023-2026.
-**/
+ * (C) Copyright. LighSync Games. 2023-2026.
+ * (C) Copyright. Gleb Ustimenko. 2026.
+***/
 
 #ifndef HLSDK_PORTABLE_WEAPON_MODULAR_H
 #define HLSDK_PORTABLE_WEAPON_MODULAR_H
@@ -16,10 +17,20 @@
 extern int gmsgWeaponList;
 extern int gmsgCurWeapon;
 
-// static cvar_t cl_changehand = { "cl_changehand", "0", FCVAR_ARCHIVE };
-// inline void RegisterModularCvars() {
-//     CVAR_REGISTER(&cl_changehand);
-// }
+#define ANIMEXT_CARBINE      "carbine"
+#define ANIMEXT_ONEHANDED    "onehanded"
+#define ANIMEXT_DUALPISTOLS  "dualpistols"
+#define ANIMEXT_RIFLE        "rifle"
+#define ANIMEXT_MP5          "mp5"
+#define ANIMEXT_SHOTGUN      "shotgun"
+#define ANIMEXT_M249         "m249"
+#define ANIMEXT_AK47         "ak47"
+#define ANIMEXT_C4           "c4"
+#define ANIMEXT_KNIFE        "knife"
+#define ANIMEXT_GRENADE      "grenade"
+#define ANIMEXT_SHIELDGUN    "shieldgun"
+#define ANIMEXT_SHIELDGREN   "shieldgren"
+#define ANIMEXT_SHIELDKNIFE  "shieldknife"
 
 struct ModularWeaponInfo {
     const char* classname;
@@ -65,6 +76,7 @@ class CBaseModularWeapon : public CBasePlayerWeapon {
 protected:
     ModularWeaponInfo m_Info;
     int m_iShell;
+    bool m_bAltShoot;
 
     static inline float WTime() { return gpGlobals->time; }
 
@@ -90,8 +102,73 @@ protected:
             m_flTimeWeaponIdle = t;
     }
 
+    void BuildPlayerSeqName(char* out, size_t size, const char* state) const {
+        const char* stance = (m_pPlayer->pev->flags & FL_DUCKING) ? "crouch" : "ref";
+        snprintf(out, size, "%s_%s_%s", stance, state, m_pPlayer->m_szAnimExtention);
+    }
+
+    bool HasPlayerSeq(const char* state) const {
+        if (!m_pPlayer)
+            return false;
+        char name[64];
+        BuildPlayerSeqName(name, sizeof(name), state);
+        return m_pPlayer->LookupSequence(name) != -1;
+    }
+
+    bool PlayPlayerSeq(const char* state) {
+        if (!m_pPlayer)
+            return false;
+
+        char name[64];
+        BuildPlayerSeqName(name, sizeof(name), state);
+
+        const int seq = m_pPlayer->LookupSequence(name);
+        if (seq == -1)
+            return false;
+
+        m_pPlayer->pev->sequence = seq;
+        m_pPlayer->pev->frame = 0;
+        m_pPlayer->ResetSequenceInfo();
+        m_pPlayer->m_Activity = ACT_RANGE_ATTACK1;
+        return true;
+    }
+
+    void PlayThirdPersonShoot() {
+        if (m_bAltShoot && PlayPlayerSeq("shoot2")) {
+            m_bAltShoot = false;
+            return;
+        }
+        m_pPlayer->SetAnimation(PLAYER_ATTACK1);
+        m_bAltShoot = HasPlayerSeq("shoot2");
+    }
+
+    void PlayThirdPersonReload() {
+        PlayPlayerSeq("reload");
+    }
+
+    void ApplyAnimExtension() {
+        if (!m_pPlayer)
+            return;
+
+        const char* ext = (m_Info.animExtension && *m_Info.animExtension)
+                          ? m_Info.animExtension
+                          : ANIMEXT_CARBINE;
+
+        strncpy(m_pPlayer->m_szAnimExtention, ext, sizeof(m_pPlayer->m_szAnimExtention) - 1);
+        m_pPlayer->m_szAnimExtention[sizeof(m_pPlayer->m_szAnimExtention) - 1] = '\0';
+
+        if (!HasPlayerSeq("aim")) {
+            ALERT(at_console, "[Modular] %s: player model has no sequence '%s_aim_%s' (animExtension must be only the suffix)\n",
+                  m_Info.classname, (m_pPlayer->pev->flags & FL_DUCKING) ? "crouch" : "ref", ext);
+        }
+    }
+
 public:
-    void SetWeaponInfo(const ModularWeaponInfo& info) { m_Info = info; }
+    void SetWeaponInfo(const ModularWeaponInfo& info) {
+        m_Info = info;
+        if (m_pPlayer && m_pPlayer->m_pActiveItem == this)
+            ApplyAnimExtension();
+    }
 
     void Spawn() override {
         Precache();
@@ -100,6 +177,7 @@ public:
         m_iDefaultAmmo = m_Info.maxClip;
         m_iClip = m_Info.maxClip;
         m_fInReload = FALSE;
+        m_bAltShoot = false;
         FallInit();
     }
 
@@ -173,7 +251,7 @@ public:
         if (!pTargetPlayer)
             return FALSE;
 
-        if (pTargetPlayer->GiveAmmo(m_Info.maxClip, m_Info.ammoType, m_Info.maxAmmo) != -1) {
+        if (pTargetPlayer->GiveAmmo(m_Info.maxClip, (char*)m_Info.ammoType, m_Info.maxAmmo) != -1) {
             EMIT_SOUND(ENT(pTargetPlayer->pev), CHAN_ITEM, "items/9mmclip1.wav", 1.0, ATTN_NORM);
             return TRUE;
         }
@@ -181,58 +259,12 @@ public:
         return FALSE;
     }
 
-    /*BOOL Deploy() override {
-        static bool cvarsRegistered = false;
-        if (!cvarsRegistered) {
-            RegisterModularCvars();
-            cvarsRegistered = true;
-        }
+    BOOL Deploy() override {
+        m_bAltShoot = false;
+        ApplyAnimExtension();
 
-        m_iId = m_Info.weaponId;
-        m_pPlayer->m_pActiveItem = this;
-        m_iPrimaryAmmoType = GetModularAmmoIndex(m_pPlayer, m_Info.ammoType);
-        m_fInReload = FALSE;
-
-        float t = WTime();
-        m_flNextPrimaryAttack   = t + 0.5f;
-        m_flNextSecondaryAttack = t + 0.5f;
-        m_flTimeWeaponIdle      = t + 5.0f;
-
-        SyncClip();
-
-        bool isLeftHand = (cl_changehand.value != 0.0f);
-        const char* anim = isLeftHand ? "onehanded" : ((m_Info.animExtension && *m_Info.animExtension) ? m_Info.animExtension : "rifle");
-
-        return DefaultDeploy((char*)m_Info.viewModel, (char*)m_Info.playerModel, m_Info.animDraw, (char*)anim);
-    }*/
-    /*BOOL Deploy() override {
-        static bool cvarsRegistered = false;
-        if (!cvarsRegistered) {
-            RegisterModularCvars();
-            cvarsRegistered = true;
-        }
-
-        m_iId = m_Info.weaponId;
-        m_pPlayer->m_pActiveItem = this;
-        m_iPrimaryAmmoType = GetModularAmmoIndex(m_pPlayer, m_Info.ammoType);
-        m_fInReload = FALSE;
-
-        float t = WTime();
-        m_flNextPrimaryAttack   = t + 0.5f;
-        m_flNextSecondaryAttack = t + 0.5f;
-        m_flTimeWeaponIdle      = t + 5.0f;
-
-        SyncClip();
-        const char* anim = (m_Info.animExtension && *m_Info.animExtension) ? m_Info.animExtension : "rifle";
-
-        return DefaultDeploy((char*)m_Info.viewModel, (char*)m_Info.playerModel, m_Info.animDraw, (char*)anim);
-    }*/
-    BOOL CBaseModularWeapon::Deploy() override {
-        const char* anim = (m_Info.animExtension && *m_Info.animExtension)
-                           ? m_Info.animExtension
-                           : "carbine";
-        strcpy(m_pPlayer->m_szAnimExtention, anim);
-        return DefaultDeploy((char*)m_Info.viewModel, (char*)m_Info.playerModel, m_Info.animDraw, (char*)anim);
+        const char* ext = (m_Info.animExtension && *m_Info.animExtension) ? m_Info.animExtension : ANIMEXT_CARBINE;
+        return DefaultDeploy((char*)m_Info.viewModel, (char*)m_Info.playerModel, m_Info.animDraw, (char*)ext);
     }
 
     void PrimaryAttack() override {
@@ -259,7 +291,7 @@ public:
         m_pPlayer->m_iWeaponFlash = NORMAL_GUN_FLASH;
 
         EMIT_SOUND(ENT(m_pPlayer->pev), CHAN_WEAPON, m_Info.soundFire, 1.0, ATTN_NORM);
-        m_pPlayer->SetAnimation(PLAYER_ATTACK1);
+        PlayThirdPersonShoot();
 
         int animToPlay = m_Info.animFireMin;
         if (m_Info.animFireMax > m_Info.animFireMin) {
@@ -305,6 +337,7 @@ public:
 
         m_fInReload = TRUE;
         SendWeaponAnim(m_Info.animReload);
+        PlayThirdPersonReload();
 
         float t = WTime();
         m_flNextPrimaryAttack   = t + m_Info.reloadTime;

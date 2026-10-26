@@ -16,7 +16,7 @@ static ModularWeaponInfo kM3Info = {
     "weapons/m3_1.wav",           // soundFire
     "weapons/dryfirevalue.wav",   // soundEmpty
     1, 1,                         // slot, position
-    "carbine", WEAPON_M3,                // animExtension, weaponId
+    ANIMEXT_ONEHANDED, WEAPON_M3,                // animExtension, weaponId
     0, 5, 6,                      // animIdle (0), animReload (1), animDraw (2)
     1, 2,                         // animFireMin (3), animFireMax (4)
     3.08f, "models/shotgunshell.mdl"     // shellModel
