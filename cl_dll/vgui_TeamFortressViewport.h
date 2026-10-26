@@ -26,6 +26,7 @@
 
 // custom scheme handling
 #include "vgui_SchemeManager.h"
+#include "vgui_BuyMenu.h"
 
 #define TF_DEFS_ONLY
 #define PC_LASTCLASS 12
@@ -622,6 +623,10 @@ public:
 	ScorePanel		*m_pScoreBoard;
 	SpectatorPanel *m_pSpectatorPanel;
 	char			m_szServerName[ MAX_SERVERNAME_LENGTH ];
+
+	void ShowBuymenu();
+	bool IsBuymenuActive();
+	CBuyMenu *m_pBuymenu;
 };
 
 //============================================================

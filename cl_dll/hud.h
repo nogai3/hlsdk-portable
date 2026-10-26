@@ -571,7 +571,6 @@ public:
 	int GetNumWidth( int iNumber, int iFlags );
 	int DrawHudStringLen( const char *szIt );
 	void DrawDarkRectangle( int x, int y, int wide, int tall );
-
 private:
 	// the memory for these arrays are allocated in the first call to CHud::VidInit(), when the hud.txt and associated sprites are loaded.
 	// freed in ~CHud()
@@ -637,6 +636,8 @@ public:
 	int _cdecl MsgFunc_SetFOV( const char *pszName,  int iSize, void *pbuf );
 	int  _cdecl MsgFunc_Concuss( const char *pszName, int iSize, void *pbuf );
 
+	int _cdecl MsgFunc_Money(const char *pszName, int iSize, void *pbuf);
+	int _cdecl MsgFunc_Buyzone(const char *pszName, int iSize, void *pbuf);
 	// Screen information
 	SCREENINFO	m_scrinfo;
 
@@ -644,6 +645,9 @@ public:
 	int	m_fPlayerDead;
 	int m_iIntermission;
 	bool m_inScope;
+
+	int m_iAccount;
+	bool m_bInBuyzone;
 
 	// sprite indexes
 	int m_HUD_number_0;

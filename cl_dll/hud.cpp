@@ -288,7 +288,23 @@ int __MsgFunc_AllowSpec( const char *pszName, int iSize, void *pbuf )
 		return gViewPort->MsgFunc_AllowSpec( pszName, iSize, pbuf );
 	return 0;
 }
- 
+
+int __MsgFunc_Money(const char* pszName, int iSize, void *pbuf) {
+	return gHUD.MsgFunc_Money(pszName, iSize, pbuf);
+}
+
+int __MsgFunc_Buyzone(const char* pszName, int iSize, void *pbuf) {
+	return gHUD.MsgFunc_Buyzone(pszName, iSize, pbuf);
+}
+
+void __CmdFunc_BuyMenu(void) {
+	if (gHUD.m_bInBuyzone && gViewPort) {
+		gViewPort->ShowBuymenu();
+	} else {
+		gEngfuncs.Con_Printf("You must be in buyzone!");
+	}
+}
+
 // This is called every time the DLL is loaded
 void CHud::Init( void )
 {
@@ -396,6 +412,13 @@ void CHud::Init( void )
 	MsgFunc_ResetHUD( 0, 0, NULL );
 	ClientCmd( "richpresence_gamemode\n" );
 	ClientCmd( "richpresence_update\n" );
+
+	HOOK_MESSAGE(Money);
+	HOOK_MESSAGE(Buyzone);
+	HOOK_COMMAND("buy", BuyMenu);
+
+	m_iAccount = 0;
+	m_bInBuyzone = false;
 }
 
 // CHud destructor
@@ -781,4 +804,21 @@ bool CHud::UseVguiMOTD()
 bool CHud::UseVguiScoreBoard()
 {
 	return m_pCvarScoreboardVGUI && m_pCvarScoreboardVGUI->value;
+}
+
+int CHud::MsgFunc_Money(const char *pszName, int iSize, void *pbuf) {
+	BEGIN_READ(pbuf, iSize);
+	m_iAccount = READ_LONG();
+	return 1;
+}
+
+int CHud::MsgFunc_Buyzone(const char *pszName, int iSize, void *pbuf) {
+	BEGIN_READ(pbuf, iSize);
+	m_bInBuyzone = (READ_BYTE() > 0);
+
+	if (m_bInBuyzone)
+		gHUD.m_StatusIcons.EnableIcon("buyzone", 0, 160, 0);
+	else
+		gHUD.m_StatusIcons.DisableIcon("buyzone");
+	return 1;
 }

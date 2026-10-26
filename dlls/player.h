@@ -323,12 +323,17 @@ public:
 	char m_SbarString1[SBAR_STRING_SIZE];
 
 	void SetPrefsFromUserinfo( char *infobuffer );
-
 	float m_flNextChatTime;
-
 	int m_iAutoWepSwitch;
-
 	Vector m_vecLastViewAngles;
+
+	// Warlands variables...
+	int m_iAccount;
+	int m_iClientAccount;
+	bool m_bInBuyzone;
+	bool m_bOldBuyzone;
+
+	void GiveMoney(int money);
 };
 
 #define AUTOAIM_2DEGREES  0.0348994967025

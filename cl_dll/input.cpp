@@ -892,6 +892,12 @@ void DLLEXPORT CL_CreateMove( float frametime, struct usercmd_s *cmd, int active
 		VectorCopy( oldangles, cmd->viewangles );
 	}
 
+	if (gViewPort && gViewPort->IsBuymenuActive()) {
+		cmd->forwardmove = 0;
+		cmd->sidemove = 0;
+		cmd->upmove = 0;
+		cmd->buttons &= ~(IN_FORWARD | IN_BACK | IN_MOVELEFT | IN_MOVERIGHT | IN_JUMP | IN_DUCK | IN_ATTACK | IN_ATTACK2);
+	}
 }
 
 /*

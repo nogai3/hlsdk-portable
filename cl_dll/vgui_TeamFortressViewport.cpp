@@ -632,6 +632,10 @@ void TeamFortressViewport::Initialize( void )
 	}
 
 	App::getInstance()->setCursorOveride( App::getInstance()->getScheme()->getCursor(Scheme::scu_none) );
+
+	m_pBuymenu = new CBuyMenu();
+	m_pBuymenu->setParent(this);
+	m_pBuymenu->setVisible(false);
 }
 
 class CException;
@@ -1646,7 +1650,7 @@ void TeamFortressViewport::UpdateOnPlayerInfo()
 void TeamFortressViewport::UpdateCursorState()
 {
 	// Need cursor if any VGUI window is up
-	if( m_pSpectatorPanel->m_menuVisible || m_pCurrentMenu || m_pTeamMenu->isVisible() || GetClientVoiceMgr()->IsInSquelchMode() )
+	if((m_pBuymenu && m_pBuymenu->IsActive()) || m_pSpectatorPanel->m_menuVisible || m_pCurrentMenu || m_pTeamMenu->isVisible() || GetClientVoiceMgr()->IsInSquelchMode() )
 	{
 		CurrentMouseInput()->IN_SetVisibleMouse(true);
 		IgnoreNextMouseDelta();
@@ -2033,4 +2037,14 @@ int TeamFortressViewport::MsgFunc_ResetFade( const char *pszName, int iSize, voi
 int TeamFortressViewport::MsgFunc_SpecFade( const char *pszName, int iSize, void *pbuf )
 {
 	return 1;
+}
+
+void TeamFortressViewport::ShowBuymenu() {
+	if (m_pBuymenu) {
+		m_pBuymenu->Open();
+	}
+}
+
+bool TeamFortressViewport::IsBuymenuActive() {
+	return m_pBuymenu && m_pBuymenu->IsActive();
 }

@@ -158,6 +158,8 @@ int gmsgCurWeapon = 0;
 int gmsgHealth = 0;
 int gmsgDamage = 0;
 int gmsgBattery = 0;
+int gmsgMoney = 0;
+int gmsgBuyzone = 0;
 int gmsgTrain = 0;
 int gmsgLogo = 0;
 int gmsgWeaponList = 0;
@@ -230,6 +232,9 @@ void LinkUserMessages( void )
 
 	gmsgStatusText = REG_USER_MSG( "StatusText", -1 );
 	gmsgStatusValue = REG_USER_MSG( "StatusValue", 3 );
+
+	gmsgMoney = REG_USER_MSG("Money", 4);
+	gmsgBuyzone = REG_USER_MSG("Buyzone", 1);
 }
 
 LINK_ENTITY_TO_CLASS( player, CBasePlayer )
@@ -965,6 +970,10 @@ void CBasePlayer::Killed( entvars_t *pevAttacker, int iGib )
 
 	SetThink( &CBasePlayer::PlayerDeathThink );
 	pev->nextthink = gpGlobals->time + 0.1f;
+}
+
+void CBasePlayer::GiveMoney(int money) {
+	m_iAccount += money;
 }
 
 // Set the activity based on an event or current state
@@ -1877,6 +1886,9 @@ void CBasePlayer::UpdateStatusBar()
 
 void CBasePlayer::PreThink( void )
 {
+	m_bOldBuyzone = m_bInBuyzone;
+	m_bInBuyzone = false;
+
 	int buttonsChanged = ( m_afButtonLast ^ pev->button );	// These buttons have changed this frame
 
 	// Debounced button codes for pressed/released
@@ -2697,6 +2709,25 @@ void CBasePlayer::PostThink()
 	CheckPowerups( pev );
 
 	UpdatePlayerSound();
+
+	if (m_iAccount > 16000)
+		m_iAccount = 16000;
+	if (m_iAccount < 0)
+		m_iAccount = 0;
+
+	if (m_iAccount != m_iClientAccount) {
+		m_iClientAccount = m_iAccount;
+		MESSAGE_BEGIN(MSG_ONE, gmsgMoney, NULL, pev);
+			WRITE_LONG(m_iAccount);
+		MESSAGE_END();
+	}
+
+	if (m_bInBuyzone != m_bOldBuyzone) {
+		MESSAGE_BEGIN(MSG_ONE, gmsgBuyzone, NULL, pev);
+			WRITE_BYTE(m_bInBuyzone ? 1 : 0);
+		MESSAGE_END();
+	}
+
 pt_end:
 	if( pev->deadflag == DEAD_NO )
 		m_vecLastViewAngles = pev->angles;
@@ -3001,6 +3032,11 @@ void CBasePlayer::Spawn( void )
 	g_pGameRules->PlayerSpawn( this );
 	m_iHideHUD = 0;
 	pev->weapons |= (1 << WEAPON_SUIT);
+
+	m_iAccount = 800;
+	m_iClientAccount = -1;
+	m_bInBuyzone = false;
+	m_bOldBuyzone = false;
 }
 
 void CBasePlayer::Precache( void )
@@ -3591,34 +3627,7 @@ void CBasePlayer::CheatImpulseCommands( int iImpulse )
 		}
 		break;
 	case 101:
-		gEvilImpulse101 = TRUE;
-		GiveNamedItem( "item_suit" );
-		GiveNamedItem( "item_battery" );
-		GiveNamedItem( "weapon_crowbar" );
-		GiveNamedItem( "weapon_9mmhandgun" );
-		GiveNamedItem( "ammo_9mmclip" );
-		GiveNamedItem( "weapon_shotgun" );
-		GiveNamedItem( "ammo_buckshot" );
-		GiveNamedItem( "weapon_9mmAR" );
-		GiveNamedItem( "ammo_9mmAR" );
-		GiveNamedItem( "ammo_ARgrenades" );
-		GiveNamedItem( "weapon_handgrenade" );
-		GiveNamedItem( "weapon_tripmine" );
-#if !OEM_BUILD
-		GiveNamedItem( "weapon_357" );
-		GiveNamedItem( "ammo_357" );
-		GiveNamedItem( "weapon_crossbow" );
-		GiveNamedItem( "ammo_crossbow" );
-		GiveNamedItem( "weapon_egon" );
-		GiveNamedItem( "weapon_gauss" );
-		GiveNamedItem( "ammo_gaussclip" );
-		GiveNamedItem( "weapon_rpg" );
-		GiveNamedItem( "ammo_rpgclip" );
-		GiveNamedItem( "weapon_satchel" );
-		GiveNamedItem( "weapon_snark" );
-		GiveNamedItem( "weapon_hornetgun" );
-#endif
-		gEvilImpulse101 = FALSE;
+		m_iAccount = 16000;
 		break;
 	case 102:
 		// Gibbage!!!

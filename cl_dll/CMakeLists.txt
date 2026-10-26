@@ -109,6 +109,8 @@ set (CLDLL_SOURCES
 	../public/safe_snprintf.c
 		hud_crosshair.cpp
 		hud_crosshair.h
+		vgui_BuyMenu.h
+		vgui_BuyMenu.cpp
 )
 
 list(APPEND CLDLL_SOURCES

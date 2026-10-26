@@ -167,7 +167,8 @@ if(MSVC)
 			weapon_deagle.cpp
 			weapon_p228.cpp
 			weapon_dualelites.cpp
-	)
+            func_buyzone.cpp
+    )
 endif()
 
 add_library (${SVDLL_LIBRARY} SHARED ${SVDLL_SOURCES})

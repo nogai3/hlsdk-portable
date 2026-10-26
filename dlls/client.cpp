@@ -610,6 +610,35 @@ void ClientCommand( edict_t *pEntity )
 		// clear 'Unknown command: VModEnable' in singleplayer
 		return;
 	}
+	else if (FStrEq(pcmd, "ak47"))
+	{
+		CBasePlayer *pPlayer = GetClassPtr((CBasePlayer*)pev);
+		if (pPlayer->IsAlive() && pPlayer->m_bInBuyzone) {
+			if (pPlayer->m_iAccount >= 2500) {
+				pPlayer->m_iAccount -= 2500;
+				pPlayer->GiveNamedItem("weapon_ak47");
+				pPlayer->GiveAmmo(90, "762", 90);
+				EMIT_SOUND(ENT(pPlayer->pev), CHAN_ITEM, "items/gunpickup2.wav", 1.0f, ATTN_NORM);
+			} else {
+				ClientPrint(pPlayer->pev, HUD_PRINTCENTER, "You haven`t influence funds!");
+			}
+		}
+		return;
+	}
+	else if (FStrEq(pcmd, "hegrenade"))
+	{
+		CBasePlayer *pPlayer = GetClassPtr((CBasePlayer*) pev);
+		if (pPlayer->IsAlive() && pPlayer->m_bInBuyzone) {
+			if (pPlayer->m_iAccount >= 300) {
+				pPlayer->m_iAccount -= 300;
+				pPlayer->GiveNamedItem("weapon_hegrenade");
+				EMIT_SOUND(ENT(pPlayer->pev), CHAN_ITEM, "items/gunpickup2.wav", 1.0f, ATTN_NORM);
+			} else {
+				ClientPrint(pPlayer->pev, HUD_PRINTCENTER, "You haven`t influence funds!");
+			}
+		}
+		return;
+	}
 	else
 	{
 		// tell the user they entered an unknown command
